@@ -280,10 +280,64 @@ class AdminView(generics.GenericAPIView):
         username = request.data.get('username')
         password = request.data.get('password')
 
-        if(username != "admin" or password != "admin" ):
+        user = authenticate(request, username=username, password=password)
+        if user is None:
             return Response({'response':'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
         volunteers = Volunteer.objects.all().order_by('city')
         volunteers_serializer = VolunteerSerializer(instance=volunteers, many=True)
 
         return Response(volunteers_serializer.data,  status=status.HTTP_200_OK)
+
+
+class EventView(generics.GenericAPIView):
+    serializer_class = EventSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+
+        event_data = serializer.data
+        if event_data["notify"]:
+            city = event_data["city"]
+            email_list = list(Volunteer.objects.values_list('email', flat=True).filter(city=city))
+            email_body = "Team Binary invites you to join campaign in your city.\nDeatils are give below:\nName of campaign:"+event_data["name"]+"\nAddress:"+event_data["address"]+"\nDate:"+event_data["date"]+"\nInstructions:"+event_data["details"]+"\n\nThanks and Regards,\nTeam Binary"
+            data = {'email_body': email_body, 'to_email': email_list,
+                'email_subject': 'Invitation To campaign'}
+            Util.send_email(data)
+        return Response(event_data, status=status.HTTP_201_CREATED)
+
+
+
+
+class GetEventView(generics.GenericAPIView):
+    serializer_class = EventSerializer
+
+    def get(self, request):
+
+        upcoming_events = Event.objects.filter(date__gt = datetime.datetime.now().date()).order_by('-date')[:5]
+
+        upcoming_events_serializer = EventSerializer(instance=upcoming_events, many=True)
+
+        return Response(upcoming_events_serializer.data,  status=status.HTTP_200_OK)
+
+
+class StatiscticsView(generics.GenericAPIView):
+
+    def get(self, request):
+        
+        volunteers_count = Volunteer.objects.count()
+        total_events_count = Event.objects.count()
+        upcoming_events_count = Event.objects.filter(date__gt = datetime.datetime.now().date()).count()
+        trees_planted = 212
+        
+        resp = {
+                    'volunteers': volunteers_count,
+                    'planted': trees_planted,
+                    'total_events': total_events_count,
+                    'upcoming_events': upcoming_events_count,
+                }
+
+        return Response(resp, status=status.HTTP_200_OK)
