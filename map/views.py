@@ -1,6 +1,8 @@
 import os
 from django.shortcuts import render
 from django. conf import settings
+from django.contrib.auth import authenticate, login, logout
+import datetime
 
 #rest import
 from rest_framework import generics, status, views, permissions
@@ -8,17 +10,19 @@ from rest_framework.response import Response
 
 #serializers
 from .serializers import (
-    VolunteerSerializer
+    VolunteerSerializer,
+    EventSerializer
 )
 
 #models
-from .models import Volunteer
+from .models import Volunteer, Event
 
 # generic base view
 from django.views.generic import TemplateView 
 
 #gee
 import ee
+ee.Initialize()
 
 
 #folium
