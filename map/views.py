@@ -307,7 +307,7 @@ class EventView(generics.GenericAPIView):
         if event_data["notify"]:
             city = event_data["city"]
             email_list = list(Volunteer.objects.values_list('email', flat=True).filter(city=city))
-            email_body = "Team Binary invites you to join campaign in your city.\nDeatils are give below:\nName of campaign:"+event_data["name"]+"\nAddress:"+event_data["address"]+"\nDate:"+event_data["date"]+"\nInstructions:"+event_data["details"]+"\n\nThanks and Regards,\nTeam Binary"
+            email_body = "Dear Volunteer,\n\nTeam Binary invites you to join a green campaign in your city.\nDetails are as follows:\nName of campaign: "+event_data["name"]+"\nAddress: "+event_data["address"]+"\nDate: "+event_data["date"]+"\nInstructions: "+event_data["details"]+"\n\nThanks and Regards,\nTeam Binary"
             data = {'email_body': email_body, 'to_email': email_list,
                 'email_subject': 'Invitation To campaign'}
             Util.send_email(data)
