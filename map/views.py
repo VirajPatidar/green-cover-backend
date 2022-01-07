@@ -268,8 +268,9 @@ class VolunteerView(generics.GenericAPIView):
         volunteer_data = serializer.data
 
         volunteer = Volunteer.objects.get(email=volunteer_data['email'])
+        to_email=[volunteer.email]
         email_body = "Hello "+volunteer.name+",\n\nWelcome to Green Cover Analytics Tool, a initiative by team Binary\n"+"Thank you for becoming a volunteer.\nWe will contact you soon regarding our green drive to reduce green cover depletion and spread awareness in "+ volunteer.city+", Maharashtra-"+ str(volunteer.pincode) +".\n\nThanks and Regards,\nTeam Binary"
-        data = {'email_body': email_body, 'to_email': volunteer.email,
+        data = {'email_body': email_body, 'to_email': to_email,
                 'email_subject': 'Welcome'}
 
         Util.send_email(data)
