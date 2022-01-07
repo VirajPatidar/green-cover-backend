@@ -22,7 +22,6 @@ from django.views.generic import TemplateView
 
 #gee
 import ee
-ee.Initialize()
 
 
 #folium
