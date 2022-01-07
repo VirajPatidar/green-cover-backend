@@ -5,7 +5,7 @@ class Volunteer(models.Model):
     name = models.CharField(max_length=20)
     email = models.EmailField(max_length=255, unique=True)
     age = models.IntegerField()
-    phone = models.IntegerField()
+    phone = models.BigIntegerField()
     city = models.CharField(max_length=20)
     pincode = models.IntegerField()
 
